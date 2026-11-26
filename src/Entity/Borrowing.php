@@ -19,8 +19,20 @@ class Borrowing
     #[ORM\Column]
     private ?\DateTimeImmutable $dueDate = null;
 
-    #[ORM\Column]
+    #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $returnedAt = null;
+
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'borrowings')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?User $user = null;
+
+    #[ORM\ManyToOne(targetEntity: Book::class, inversedBy: 'borrowings')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Book $book = null;
+
+    #[ORM\OneToOne(targetEntity: Reservation::class, inversedBy: 'borrowing')]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
+    private ?Reservation $reservation = null;
 
     public function getId(): ?int
     {
@@ -63,9 +75,45 @@ class Borrowing
         return $this->returnedAt;
     }
 
-    public function setReturnedAt(\DateTimeImmutable $returnedAt): static
+    public function setReturnedAt(?\DateTimeImmutable $returnedAt): static
     {
         $this->returnedAt = $returnedAt;
+
+        return $this;
+    }
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): static
+    {
+        $this->user = $user;
+
+        return $this;
+    }
+
+    public function getBook(): ?Book
+    {
+        return $this->book;
+    }
+
+    public function setBook(?Book $book): static
+    {
+        $this->book = $book;
+
+        return $this;
+    }
+
+    public function getReservation(): ?Reservation
+    {
+        return $this->reservation;
+    }
+
+    public function setReservation(?Reservation $reservation): static
+    {
+        $this->reservation = $reservation;
 
         return $this;
     }

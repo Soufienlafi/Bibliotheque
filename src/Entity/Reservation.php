@@ -22,6 +22,17 @@ class Reservation
     #[ORM\Column(length: 20)]
     private ?string $status = null;
 
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'reservations')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?User $user = null;
+
+    #[ORM\ManyToOne(targetEntity: Book::class, inversedBy: 'reservations')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Book $book = null;
+
+    #[ORM\OneToOne(targetEntity: Borrowing::class, mappedBy: 'reservation')]
+    private ?Borrowing $borrowing = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -66,6 +77,52 @@ class Reservation
     public function setStatus(string $status): static
     {
         $this->status = $status;
+
+        return $this;
+    }
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): static
+    {
+        $this->user = $user;
+
+        return $this;
+    }
+
+    public function getBook(): ?Book
+    {
+        return $this->book;
+    }
+
+    public function setBook(?Book $book): static
+    {
+        $this->book = $book;
+
+        return $this;
+    }
+
+    public function getBorrowing(): ?Borrowing
+    {
+        return $this->borrowing;
+    }
+
+    public function setBorrowing(?Borrowing $borrowing): static
+    {
+        // unset the owning side of the relation if necessary
+        if ($borrowing === null && $this->borrowing !== null) {
+            $this->borrowing->setReservation(null);
+        }
+
+        // set the owning side of the relation if necessary
+        if ($borrowing !== null && $borrowing->getReservation() !== $this) {
+            $borrowing->setReservation($this);
+        }
+
+        $this->borrowing = $borrowing;
 
         return $this;
     }
