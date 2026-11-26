@@ -18,23 +18,20 @@ class RegistrationFormType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-    ->add('fullName', TextType::class, [
-        'label' => 'Full name',
-        'constraints' => [
-            new NotBlank(message: 'Please enter your full name'),
-            new Length(max: 255),
-        ],
-    ])
-    ->add('studentNumber', TextType::class, [
-        'label' => 'Student number',
-        'constraints' => [
-            new NotBlank(message: 'Please enter your student number'),
-            new Length(max: 30),
-        ],
-    ])
-            ->add('email')
+            ->add('fullName', TextType::class, [
+                'label' => 'Full name',
+                'attr' => ['placeholder' => 'John Doe', 'autocomplete' => 'name'],
+            ])
+            ->add('studentNumber', TextType::class, [
+                'label' => 'Student number',
+                'attr' => ['placeholder' => 'e.g. 20240123'],
+            ])
+            ->add('email', TextType::class, [
+                'attr' => ['placeholder' => 'you@university.com', 'autocomplete' => 'email'],
+            ])
             ->add('agreeTerms', CheckboxType::class, [
-                                'mapped' => false,
+                'label' => 'I agree to the terms',
+                'mapped' => false,
                 'constraints' => [
                     new IsTrue(
                         message: 'You should agree to our terms.',
@@ -42,9 +39,9 @@ class RegistrationFormType extends AbstractType
                 ],
             ])
             ->add('plainPassword', PasswordType::class, [
-                                // instead of being set onto the object directly,
-                // this is read and encoded in the controller
                 'mapped' => false,
+                'label' => 'Password',
+                'help' => 'At least 6 characters.',
                 'attr' => ['autocomplete' => 'new-password'],
                 'constraints' => [
                     new NotBlank(
