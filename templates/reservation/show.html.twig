@@ -22,6 +22,8 @@
             <tr>
                 <th>Status</th>
                 <td>{{ reservation.status }}</td>
+                {% set colors = {pending: 'warning', fulfilled: 'success', cancelled: 'secondary', expired: 'danger'} %}
+                <span class="badge bg-{{ colors[reservation.status] ?? 'light' }}">{{ reservation.status|capitalize }}</span>
             </tr>
         </tbody>
     </table>

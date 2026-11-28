@@ -1,39 +1,61 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Reservation index{% endblock %}
+{% block title %}Reservations{% endblock %}
 
 {% block body %}
-    <h1>Reservation index</h1>
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 mb-0">Reservations</h1>
+        <a href="{{ path('app_reservation_new') }}" class="btn btn-primary">New reservation</a>
+    </div>
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>ReservedAt</th>
-                <th>ExpiresAt</th>
-                <th>Status</th>
-                <th>actions</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for reservation in reservations %}
-            <tr>
-                <td>{{ reservation.id }}</td>
-                <td>{{ reservation.reservedAt ? reservation.reservedAt|date('Y-m-d H:i:s') : '' }}</td>
-                <td>{{ reservation.expiresAt ? reservation.expiresAt|date('Y-m-d H:i:s') : '' }}</td>
-                <td>{{ reservation.status }}</td>
-                <td>
-                    <a href="{{ path('app_reservation_show', {'id': reservation.id}) }}">show</a>
-                    <a href="{{ path('app_reservation_edit', {'id': reservation.id}) }}">edit</a>
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="5">no records found</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+    {% set colors = {pending: 'warning', fulfilled: 'success', cancelled: 'secondary', expired: 'danger'} %}
 
-    <a href="{{ path('app_reservation_new') }}">Create new</a>
+    <div class="card shadow-sm border-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>#</th>
+                        <th>Member</th>
+                        <th>Book</th>
+                        <th>Reserved</th>
+                        <th>Expires</th>
+                        <th>Status</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for reservation in reservations %}
+                    <tr>
+                        <td>{{ reservation.id }}</td>
+                        <td>{{ reservation.user.fullName }}</td>
+                        <td>{{ reservation.book.title }}</td>
+                        <td>{{ reservation.reservedAt|date('Y-m-d') }}</td>
+                        <td>{{ reservation.expiresAt|date('Y-m-d') }}</td>
+                        <td>
+                            <span class="badge bg-{{ colors[reservation.status] ?? 'light' }}">{{ reservation.status|capitalize }}</span>
+                        </td>
+                        <td class="text-end">
+                            <a href="{{ path('app_reservation_show', {id: reservation.id}) }}" class="btn btn-sm btn-outline-secondary">Show</a>
+                            <a href="{{ path('app_reservation_edit', {id: reservation.id}) }}" class="btn btn-sm btn-outline-primary">Edit</a>
+                            {% if reservation.status == 'pending' %}
+                                <form method="post" action="{{ path('app_reservation_cancel', {id: reservation.id}) }}" class="d-inline"
+                                      onsubmit="return confirm('Cancel this reservation?');">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('cancel' ~ reservation.id) }}">
+                                    <button class="btn btn-sm btn-outline-danger">Cancel</button>
+                                </form>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="7" class="text-center text-muted py-4">No reservations found.</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
 {% endblock %}
