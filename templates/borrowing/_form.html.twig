@@ -1,4 +1,14 @@
 {{ form_start(form) }}
-    {{ form_widget(form) }}
-    <button class="btn">{{ button_label|default('Save') }}</button>
+    <div class="row">
+        <div class="col-md-6">{{ form_row(form.user) }}</div>
+        <div class="col-md-6">{{ form_row(form.book) }}</div>
+    </div>
+    {{ form_row(form.reservation) }}
+    <div class="row">
+        <div class="col-md-6">{{ form_row(form.borrowedAt) }}</div>
+        <div class="col-md-6">{{ form_row(form.dueDate) }}</div>
+    </div>
+
+    <button type="submit" class="btn btn-primary">{{ button_label|default('Save') }}</button>
+    <a href="{{ path('app_borrowing_index') }}" class="btn btn-outline-secondary">Cancel</a>
 {{ form_end(form) }}

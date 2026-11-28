@@ -1,39 +1,66 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Borrowing index{% endblock %}
+{% block title %}Borrowings{% endblock %}
 
 {% block body %}
-    <h1>Borrowing index</h1>
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 mb-0">Borrowings</h1>
+        <a href="{{ path('app_borrowing_new') }}" class="btn btn-primary">New borrowing</a>
+    </div>
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>BorrowedAt</th>
-                <th>DueDate</th>
-                <th>ReturnedAt</th>
-                <th>actions</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for borrowing in borrowings %}
-            <tr>
-                <td>{{ borrowing.id }}</td>
-                <td>{{ borrowing.borrowedAt ? borrowing.borrowedAt|date('Y-m-d H:i:s') : '' }}</td>
-                <td>{{ borrowing.dueDate ? borrowing.dueDate|date('Y-m-d H:i:s') : '' }}</td>
-                <td>{{ borrowing.returnedAt ? borrowing.returnedAt|date('Y-m-d H:i:s') : '' }}</td>
-                <td>
-                    <a href="{{ path('app_borrowing_show', {'id': borrowing.id}) }}">show</a>
-                    <a href="{{ path('app_borrowing_edit', {'id': borrowing.id}) }}">edit</a>
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="5">no records found</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-
-    <a href="{{ path('app_borrowing_new') }}">Create new</a>
+    <div class="card shadow-sm border-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>#</th>
+                        <th>Member</th>
+                        <th>Book</th>
+                        <th>Borrowed</th>
+                        <th>Due</th>
+                        <th>Returned</th>
+                        <th>Status</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for borrowing in borrowings %}
+                    <tr>
+                        <td>{{ borrowing.id }}</td>
+                        <td>{{ borrowing.user.fullName }}</td>
+                        <td>{{ borrowing.book.title }}</td>
+                        <td>{{ borrowing.borrowedAt|date('Y-m-d') }}</td>
+                        <td>{{ borrowing.dueDate|date('Y-m-d') }}</td>
+                        <td>{{ borrowing.returnedAt ? borrowing.returnedAt|date('Y-m-d') : '-' }}</td>
+                        <td>
+                            {% if borrowing.returnedAt %}
+                                <span class="badge bg-success">Returned</span>
+                            {% elseif borrowing.dueDate < date('today') %}
+                                <span class="badge bg-danger">Overdue</span>
+                            {% else %}
+                                <span class="badge bg-primary">On loan</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-end">
+                            <a href="{{ path('app_borrowing_show', {id: borrowing.id}) }}" class="btn btn-sm btn-outline-secondary">Show</a>
+                            <a href="{{ path('app_borrowing_edit', {id: borrowing.id}) }}" class="btn btn-sm btn-outline-primary">Edit</a>
+                            {% if not borrowing.returnedAt %}
+                                <form method="post" action="{{ path('app_borrowing_return', {id: borrowing.id}) }}" class="d-inline">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('return' ~ borrowing.id) }}">
+                                    <button class="btn btn-sm btn-success">Return</button>
+                                </form>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="8" class="text-center text-muted py-4">No borrowings found.</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
 {% endblock %}
